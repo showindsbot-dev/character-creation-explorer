@@ -1,20 +1,40 @@
 import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import V1GlassCard from './views/V1GlassCard'
-import V2Conversation from './views/V2Conversation'
-import V3MoodBoard from './views/V3MoodBoard'
+import ConversationStart from './views/ConversationStart'
+import ResultV1 from './views/ResultV1'
+import ResultV2 from './views/ResultV2'
+import ResultV3 from './views/ResultV3'
 import './index.css'
 
 type Version = 'V1' | 'V2' | 'V3'
 
 export default function App() {
   const [active, setActive] = useState<Version>('V1')
+  const [conversationDone, setConversationDone] = useState(false)
+
+  function handleTabSwitch(v: Version) {
+    setActive(v)
+  }
+
+  function handleDone() {
+    setConversationDone(true)
+  }
+
+  function handleBack() {
+    setConversationDone(false)
+  }
 
   return (
-    <div style={{ minHeight: '100vh', background: 'var(--bg-base)', display: 'flex', flexDirection: 'column' }}>
+    <div style={{
+      height: '100vh',
+      background: 'var(--bg-base)',
+      display: 'flex',
+      flexDirection: 'column',
+      overflow: 'hidden',
+    }}>
       {/* Top nav */}
       <nav style={{
-        position: 'sticky', top: 0, zIndex: 100,
+        position: 'relative', zIndex: 100,
         background: 'rgba(18,17,19,0.92)',
         backdropFilter: 'blur(20px)',
         WebkitBackdropFilter: 'blur(20px)',
@@ -48,7 +68,7 @@ export default function App() {
           {(['V1', 'V2', 'V3'] as Version[]).map((v) => (
             <motion.button
               key={v}
-              onClick={() => setActive(v)}
+              onClick={() => handleTabSwitch(v)}
               whileTap={{ scale: 0.95 }}
               style={{
                 padding: '5px 20px',
@@ -76,11 +96,17 @@ export default function App() {
       </nav>
 
       {/* Page content */}
-      <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
+      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden', minHeight: 0 }}>
         <AnimatePresence mode="wait">
-          {active === 'V1' && <V1GlassCard key="v1" />}
-          {active === 'V2' && <V2Conversation key="v2" />}
-          {active === 'V3' && <V3MoodBoard key="v3" />}
+          {!conversationDone ? (
+            <ConversationStart key="conversation" onDone={handleDone} />
+          ) : active === 'V1' ? (
+            <ResultV1 key="result-v1" onBack={handleBack} />
+          ) : active === 'V2' ? (
+            <ResultV2 key="result-v2" onBack={handleBack} />
+          ) : (
+            <ResultV3 key="result-v3" onBack={handleBack} />
+          )}
         </AnimatePresence>
       </div>
     </div>
