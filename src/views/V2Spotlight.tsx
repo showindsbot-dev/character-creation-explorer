@@ -17,32 +17,38 @@ const PARTICLES = [
   { left: '12%', top: '55%', delay: '2.2s', dur: '4.5s' },
 ]
 
-function HumanSilhouette({ scale = 1 }: { scale?: number }) {
-  const s = scale
+function HumanSilhouette() {
+  const gradient = 'linear-gradient(180deg, rgba(251,35,194,0.2) 0%, rgba(100,0,75,0.1) 100%)'
   return (
     <motion.div
       animate={{ scale: [1, 1.015, 1] }}
       transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut' }}
-      style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: 120 * s, height: 200 * s }}
+      style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: 140, height: 220, flexShrink: 0 }}
     >
       {/* Head */}
       <div style={{
-        width: 52 * s, height: 52 * s, borderRadius: '50%', flexShrink: 0,
-        background: 'linear-gradient(180deg, rgba(251,35,194,0.18) 0%, rgba(100,0,75,0.10) 100%)',
+        width: 48, height: 48, borderRadius: '50%', flexShrink: 0,
+        background: gradient,
         border: '1px solid rgba(251,35,194,0.12)',
       }} />
       {/* Neck */}
       <div style={{
-        width: 14 * s, height: 16 * s, flexShrink: 0,
-        background: 'linear-gradient(180deg, rgba(251,35,194,0.13) 0%, rgba(100,0,75,0.08) 100%)',
+        width: 12, height: 12, flexShrink: 0,
+        background: gradient,
       }} />
-      {/* Torso / shoulders */}
+      {/* Shoulders + upper body */}
       <div style={{
-        width: 110 * s, height: 100 * s, flexShrink: 0,
-        borderRadius: '50% 50% 10% 10%',
-        background: 'linear-gradient(180deg, rgba(251,35,194,0.15) 0%, rgba(100,0,75,0.08) 100%)',
-        boxShadow: '0 0 40px rgba(251,35,194,0.12)',
-        border: '1px solid rgba(251,35,194,0.08)',
+        width: 130, height: 90, flexShrink: 0,
+        borderRadius: '65px 65px 20px 20px',
+        background: gradient,
+        boxShadow: '0 0 30px rgba(251,35,194,0.15)',
+      }} />
+      {/* Lower body hint */}
+      <div style={{
+        width: 60, height: 60, flexShrink: 0,
+        borderRadius: 10,
+        background: gradient,
+        marginTop: 4,
       }} />
     </motion.div>
   )
@@ -59,6 +65,7 @@ export function V2Spotlight() {
   const [extraCards, setExtraCards] = useState<number[]>([])
   const [chatInput, setChatInput] = useState('')
   const [saveIdx, setSaveIdx] = useState<number | null>(null)
+  const [textFocused, setTextFocused] = useState(false)
 
   const generate = () => {
     setGenerating(true)
@@ -81,21 +88,21 @@ export function V2Spotlight() {
     <div style={{ height: '100%', display: 'flex', flexDirection: 'column', position: 'relative', overflow: 'hidden', background: '#0a090b' }}>
       {saveIdx !== null && <SaveFlow characterIndex={saveIdx} onClose={() => setSaveIdx(null)} />}
 
-      {/* Background portrait atmosphere */}
+      {/* Background portrait atmosphere — opacity 0.18 */}
       <img src={PORTRAITS[0]} alt="" style={{
         position: 'absolute', left: 0, top: '50%', transform: 'translateY(-50%)',
         width: 200, height: 300, objectFit: 'cover',
-        filter: 'blur(40px) saturate(0.3)', opacity: 0.12, pointerEvents: 'none', zIndex: 0,
+        filter: 'blur(40px) saturate(0.3)', opacity: 0.18, pointerEvents: 'none', zIndex: 0,
       }} />
       <img src={PORTRAITS[1]} alt="" style={{
         position: 'absolute', right: 0, top: '50%', transform: 'translateY(-50%)',
         width: 200, height: 300, objectFit: 'cover',
-        filter: 'blur(40px) saturate(0.3)', opacity: 0.12, pointerEvents: 'none', zIndex: 0,
+        filter: 'blur(40px) saturate(0.3)', opacity: 0.18, pointerEvents: 'none', zIndex: 0,
       }} />
       <img src={PORTRAITS[2]} alt="" style={{
         position: 'absolute', left: '50%', top: 0, transform: 'translateX(-50%)',
         width: 200, height: 300, objectFit: 'cover',
-        filter: 'blur(40px) saturate(0.3)', opacity: 0.12, pointerEvents: 'none', zIndex: 0,
+        filter: 'blur(40px) saturate(0.3)', opacity: 0.18, pointerEvents: 'none', zIndex: 0,
       }} />
 
       {/* Radial dark vignette overlay */}
@@ -104,11 +111,18 @@ export function V2Spotlight() {
         background: 'radial-gradient(ellipse 80% 80% at 50% 50%, transparent 30%, rgba(0,0,0,0.4) 100%)',
       }} />
 
-      {/* Spotlight cone */}
+      {/* Spotlight cone — white glow from top */}
       <div style={{
         position: 'absolute', top: 0, left: 0, right: 0, height: '50%', pointerEvents: 'none',
         background: 'radial-gradient(ellipse 60% 100% at 50% 0%, rgba(255,255,255,0.04) 0%, transparent 70%)',
         zIndex: 0,
+      }} />
+
+      {/* Spotlight cone — pink radial from top-center */}
+      <div style={{
+        position: 'absolute', top: 0, left: '50%', transform: 'translateX(-50%)',
+        width: 400, height: 300, pointerEvents: 'none', zIndex: 0,
+        background: 'radial-gradient(ellipse at 50% 0%, rgba(251,35,194,0.04) 0%, transparent 100%)',
       }} />
 
       {/* Particles */}
@@ -129,13 +143,12 @@ export function V2Spotlight() {
             initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
             style={{
               flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center',
-              justifyContent: 'flex-start', paddingTop: '10%', paddingBottom: '18%',
-              gap: 24, zIndex: 1, padding: '10% 48px 18%',
+              justifyContent: 'flex-start', gap: 24, zIndex: 1, padding: '8% 48px 14%',
             }}
           >
             <HumanSilhouette />
 
-            <div style={{ textAlign: 'center', display: 'flex', flexDirection: 'column', gap: 12 }}>
+            <div style={{ textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 16 }}>
               <div style={{ fontSize: 26, fontWeight: 300, letterSpacing: '0.04em', color: 'var(--text-primary)' }}>
                 Who will they be?
               </div>
@@ -143,9 +156,12 @@ export function V2Spotlight() {
                 whileHover={{ scale: 1.04 }} whileTap={{ scale: 0.97 }}
                 onClick={() => setAppState('modes')}
                 style={{
+                  display: 'block',
+                  width: 180, height: 48,
                   background: 'var(--accent-pink)', color: '#fff', border: 'none',
-                  borderRadius: 22, height: 44, padding: '0 32px', fontSize: 15, fontWeight: 600, cursor: 'pointer',
-                  boxShadow: '0 0 30px rgba(251,35,194,0.4)',
+                  borderRadius: 24, fontSize: 15, fontWeight: 600, cursor: 'pointer',
+                  margin: '0 auto',
+                  boxShadow: '0 0 20px rgba(251,35,194,0.4), 0 4px 16px rgba(0,0,0,0.3)',
                 }}
               >Begin ✦</motion.button>
             </div>
@@ -157,30 +173,31 @@ export function V2Spotlight() {
             initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
             style={{
               flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center',
-              justifyContent: 'flex-start', gap: 24, zIndex: 1, padding: '10% 48px 18%',
+              justifyContent: 'center', gap: 12, zIndex: 1, padding: '10% 48px',
             }}
           >
-            <HumanSilhouette scale={0.72} />
-
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 10, width: '100%', maxWidth: 340 }}>
-              {[
-                { m: 'text' as Mode, label: 'Write their story' },
-                { m: 'image' as Mode, label: 'Show me a photo' },
-                { m: 'design' as Mode, label: 'Design from scratch' },
-              ].map(({ m, label }, i) => (
-                <motion.button key={m}
-                  initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: i * 0.1 }}
-                  whileHover={{ scale: 1.02, borderColor: 'var(--accent-pink)' }}
-                  onClick={() => { setMode(m); setAppState('creation') }}
-                  style={{
-                    height: 52, borderRadius: 26, fontSize: 14, fontWeight: 500, cursor: 'pointer',
-                    background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.1)',
-                    color: 'var(--text-primary)', backdropFilter: 'blur(10px)',
-                  }}
-                >{label}</motion.button>
-              ))}
-            </div>
+            {[
+              { m: 'text' as Mode, icon: '✍', label: 'Write their story' },
+              { m: 'image' as Mode, icon: '⬆', label: 'Upload a reference' },
+              { m: 'design' as Mode, icon: '✦', label: 'Design from scratch' },
+            ].map(({ m, icon, label }, i) => (
+              <motion.button key={m}
+                initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: i * 0.1 }}
+                whileHover={{ borderColor: 'rgba(251,35,194,0.4)', boxShadow: '0 0 16px rgba(251,35,194,0.12)' }}
+                onClick={() => { setMode(m); setAppState('creation') }}
+                style={{
+                  width: 240, height: 52, borderRadius: 26, fontSize: 14, fontWeight: 500, cursor: 'pointer',
+                  background: 'rgba(30,28,32,0.8)', border: '1px solid rgba(255,255,255,0.08)',
+                  color: 'var(--text-primary)', backdropFilter: 'blur(10px)',
+                  display: 'flex', alignItems: 'center', gap: 12, padding: '0 20px',
+                  flexShrink: 0,
+                }}
+              >
+                <span style={{ width: 20, textAlign: 'center', color: 'var(--accent-pink-soft)', fontSize: 16, flexShrink: 0 }}>{icon}</span>
+                <span style={{ textAlign: 'left', flex: 1 }}>{label}</span>
+              </motion.button>
+            ))}
           </motion.div>
         )}
 
@@ -194,60 +211,81 @@ export function V2Spotlight() {
             }}>← Back</button>
 
             {mode === 'text' && (
-              <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 14 }}>
-                <div style={{ position: 'relative', flex: 1 }}>
-                  <textarea value={text} onChange={e => handleTextChange(e.target.value)}
-                    placeholder="Describe them... their look, their world, their story..."
-                    style={{
-                      width: '100%', height: '100%', minHeight: 200, background: 'none', border: 'none',
-                      borderBottom: '1px solid rgba(255,255,255,0.12)',
-                      color: 'var(--text-primary)', fontSize: 16, padding: '0 0 16px', outline: 'none',
-                      resize: 'none', fontFamily: 'inherit', lineHeight: 1.7,
-                    }}
-                  />
-                  {tags.length > 0 && (
-                    <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}
-                      style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginTop: 12 }}
-                    >
-                      {tags.map(t => (
-                        <div key={t} style={{
-                          height: 26, padding: '0 12px', borderRadius: 13, fontSize: 11,
-                          background: 'rgba(251,35,194,0.15)', border: '1px solid rgba(251,35,194,0.3)',
-                          color: 'var(--accent-pink-soft)', display: 'flex', alignItems: 'center',
-                        }}>✦ {t}</div>
-                      ))}
-                    </motion.div>
-                  )}
-                </div>
-                <button onClick={generate} disabled={generating} style={{
-                  height: 46, borderRadius: 23, background: generating ? 'rgba(255,255,255,0.06)' : 'var(--accent-pink)',
-                  border: 'none', color: generating ? 'var(--text-tertiary)' : '#fff', fontSize: 14, fontWeight: 600, cursor: 'pointer',
-                  boxShadow: generating ? 'none' : '0 0 30px rgba(251,35,194,0.35)',
+              <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 16, maxWidth: 600, width: '100%', alignSelf: 'center' }}>
+                <textarea
+                  value={text}
+                  onChange={e => handleTextChange(e.target.value)}
+                  onFocus={() => setTextFocused(true)}
+                  onBlur={() => setTextFocused(false)}
+                  placeholder="A girl who hacks satellites from abandoned rooftops..."
+                  style={{
+                    width: '100%', minHeight: 120, background: 'none', border: 'none',
+                    borderBottom: textFocused ? '2px solid var(--accent-pink)' : '2px solid rgba(255,255,255,0.08)',
+                    color: 'var(--text-primary)', fontSize: 20, fontWeight: 300,
+                    padding: '0 0 16px', outline: 'none', resize: 'none',
+                    fontFamily: 'inherit', lineHeight: 1.7,
+                    boxShadow: textFocused ? '0 2px 16px rgba(251,35,194,0.15)' : 'none',
+                    transition: 'border-color 0.2s, box-shadow 0.2s',
+                    boxSizing: 'border-box',
+                  }}
+                />
+                {tags.length > 0 && (
+                  <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}
+                    style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}
+                  >
+                    {tags.map(t => (
+                      <div key={t} style={{
+                        height: 26, padding: '0 12px', borderRadius: 13, fontSize: 11,
+                        background: 'rgba(251,35,194,0.15)', border: '1px solid rgba(251,35,194,0.3)',
+                        color: 'var(--accent-pink-soft)', display: 'flex', alignItems: 'center',
+                      }}>✦ {t}</div>
+                    ))}
+                  </motion.div>
+                )}
+                <button style={{
+                  background: 'none', border: 'none', color: 'var(--text-tertiary)', cursor: 'pointer',
+                  fontSize: 12, alignSelf: 'flex-start', display: 'flex', alignItems: 'center', gap: 5,
                 }}>
-                  {generating ? 'Generating...' : 'Bring them to life ✦'}
+                  <span style={{ fontSize: 15 }}>+</span> Add reference images
+                </button>
+                <button onClick={generate} disabled={generating} style={{
+                  width: 200, height: 46, borderRadius: 23,
+                  background: generating ? 'rgba(255,255,255,0.06)' : 'var(--accent-green)',
+                  border: 'none', color: generating ? 'var(--text-tertiary)' : '#000',
+                  fontSize: 14, fontWeight: 600, cursor: 'pointer',
+                  margin: '8px auto 0', display: 'block',
+                }}>
+                  {generating ? 'Generating...' : 'Generate ✦'}
                 </button>
               </div>
             )}
 
             {mode === 'image' && (
-              <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 14 }}>
+              <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 16, alignItems: 'center' }}>
                 <div style={{
-                  flex: 1, minHeight: 200, border: '1px solid rgba(251,35,194,0.4)', borderRadius: 20,
-                  display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 12, cursor: 'pointer',
-                  background: 'rgba(251,35,194,0.03)',
+                  width: '100%', maxWidth: 400, height: 260,
+                  border: '2px dashed rgba(251,35,194,0.4)', borderRadius: 16,
+                  display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 10,
+                  cursor: 'pointer', background: 'rgba(251,35,194,0.03)', flexShrink: 0,
                 }}>
-                  <div style={{ fontSize: 36 }}>📷</div>
-                  <div style={{ color: 'var(--text-secondary)', fontSize: 14 }}>Upload reference photo</div>
-                  <div style={{
-                    height: 26, padding: '0 14px', borderRadius: 13, fontSize: 11,
-                    background: 'rgba(251,35,194,0.15)', border: '1px solid rgba(251,35,194,0.3)',
-                    color: 'var(--accent-pink-soft)',
-                  }}>This character will look like your photo</div>
+                  <div style={{ fontSize: 32, color: 'var(--text-secondary)', lineHeight: 1 }}>↑</div>
+                  <div style={{ color: 'var(--text-secondary)', fontSize: 16 }}>Drop your reference</div>
+                  <div style={{ color: 'var(--text-tertiary)', fontSize: 13 }}>or browse</div>
                 </div>
+                <textarea
+                  placeholder="Any notes? (optional)"
+                  rows={1}
+                  style={{
+                    width: '100%', maxWidth: 400, background: 'none',
+                    border: 'none', borderBottom: '1px solid rgba(255,255,255,0.1)',
+                    color: 'var(--text-primary)', fontSize: 14, padding: '8px 0', outline: 'none',
+                    resize: 'none', fontFamily: 'inherit',
+                  }}
+                />
                 <button onClick={generate} style={{
-                  height: 46, borderRadius: 23, background: 'var(--accent-pink)', border: 'none',
-                  color: '#fff', fontSize: 14, fontWeight: 600, cursor: 'pointer',
-                }}>Bring them to life ✦</button>
+                  width: 200, height: 46, borderRadius: 23, background: 'var(--accent-green)', border: 'none',
+                  color: '#000', fontSize: 14, fontWeight: 600, cursor: 'pointer',
+                }}>Generate ✦</button>
               </div>
             )}
 
@@ -275,7 +313,7 @@ export function V2Spotlight() {
                           { label: 'Mythic', g: 'linear-gradient(135deg, #1a0a2e, #4a2060)' },
                         ].map(a => (
                           <button key={a.label} onClick={() => setDStep(1)} style={{
-                            aspectRatio: '2/1', borderRadius: 12, background: a.g, border: '2px solid transparent',
+                            aspectRatio: '2/1', borderRadius: 12, background: a.g, border: '1px solid rgba(255,255,255,0.08)',
                             cursor: 'pointer', display: 'flex', alignItems: 'flex-end', padding: 10,
                           }}>
                             <span style={{ color: '#fff', fontSize: 12, fontWeight: 500 }}>{a.label}</span>
@@ -323,10 +361,10 @@ export function V2Spotlight() {
                         </div>
                       ))}
                       <button onClick={generate} style={{
-                        height: 44, borderRadius: 22, background: 'var(--accent-pink)', border: 'none',
+                        width: 200, height: 44, borderRadius: 22, background: 'var(--accent-pink)', border: 'none',
                         color: '#fff', fontSize: 14, fontWeight: 600, cursor: 'pointer', marginTop: 'auto',
-                        boxShadow: '0 0 30px rgba(251,35,194,0.3)',
-                      }}>Bring them to life ✦</button>
+                        boxShadow: '0 0 30px rgba(251,35,194,0.3)', display: 'block', margin: 'auto auto 0',
+                      }}>Generate ✦</button>
                     </motion.div>
                   )}
                 </AnimatePresence>
@@ -340,19 +378,23 @@ export function V2Spotlight() {
             initial={{ opacity: 0 }} animate={{ opacity: 1 }}
             style={{ flex: 1, display: 'flex', flexDirection: 'column', padding: '20px 24px', gap: 14, overflow: 'hidden', zIndex: 1 }}
           >
-            {/* Cinematic layout: 1 large + 2 stacked */}
-            <div style={{ flex: 1, display: 'flex', gap: 10, minHeight: 0, overflow: 'hidden' }}>
+            {/* Cinematic layout: 1 large hero (55%) + 2 stacked (45%) */}
+            <div style={{ flex: 1, display: 'flex', gap: 12, minHeight: 0, overflow: 'hidden' }}>
               <motion.div style={{ flex: '0 0 55%' }}
-                initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 0.05 }}
+                initial={{ opacity: 0, scale: 0.9, y: 20 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                transition={{ delay: 0.05, type: 'spring', stiffness: 280, damping: 24 }}
               >
                 <CharacterImageCard index={0} onSelect={() => setSaveIdx(0)}
                   style={{ height: '100%', width: '100%', aspectRatio: 'unset', borderRadius: 16 }}
                 />
               </motion.div>
-              <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 10 }}>
+              <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 12 }}>
                 {[1, 2, ...extraCards].map((idx, i) => (
                   <motion.div key={i} style={{ flex: 1 }}
-                    initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 0.12 + i * 0.08 }}
+                    initial={{ opacity: 0, scale: 0.9, y: 20 }}
+                    animate={{ opacity: 1, scale: 1, y: 0 }}
+                    transition={{ delay: 0.12 + i * 0.08, type: 'spring', stiffness: 280, damping: 24 }}
                   >
                     <CharacterImageCard index={idx} onSelect={() => setSaveIdx(idx)}
                       style={{ height: '100%', width: '100%', aspectRatio: 'unset', borderRadius: 12 }}
@@ -362,9 +404,10 @@ export function V2Spotlight() {
               </div>
             </div>
 
+            {/* Slim glass input bar */}
             <div style={{
               display: 'flex', gap: 8, alignItems: 'center',
-              background: 'rgba(255,255,255,0.04)', borderRadius: 24, padding: '8px 14px',
+              background: 'rgba(255,255,255,0.04)', borderRadius: 28, padding: '8px 8px 8px 16px',
               border: '1px solid rgba(255,255,255,0.08)', backdropFilter: 'blur(10px)',
             }}>
               <input value={chatInput} onChange={e => setChatInput(e.target.value)}
@@ -372,10 +415,16 @@ export function V2Spotlight() {
                 placeholder="Direct them further..."
                 style={{ flex: 1, background: 'none', border: 'none', color: 'var(--text-primary)', fontSize: 13, outline: 'none' }}
               />
-              <button onClick={refine} style={{
-                width: 28, height: 28, borderRadius: '50%', background: 'var(--accent-pink)',
-                border: 'none', color: '#fff', cursor: 'pointer', fontSize: 13,
-              }}>↑</button>
+              <motion.button
+                whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}
+                onClick={refine}
+                style={{
+                  height: 34, padding: '0 16px', borderRadius: 17,
+                  background: 'var(--accent-pink)', border: 'none', color: '#fff',
+                  cursor: 'pointer', fontSize: 12, fontWeight: 600, whiteSpace: 'nowrap',
+                  boxShadow: '0 0 12px rgba(251,35,194,0.35)',
+                }}
+              >Cast this character</motion.button>
             </div>
 
             <div style={{ textAlign: 'center', fontSize: 11, color: 'var(--text-tertiary)', paddingBottom: 2 }}>
