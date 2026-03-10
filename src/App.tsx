@@ -39,6 +39,7 @@ const flows = [
 
 export default function App() {
   const [activeFlow, setActiveFlow] = useState<FlowType>(null)
+  const [hoveredCard, setHoveredCard] = useState<FlowType>(null)
 
   return (
     <div style={{ minHeight: '100vh', background: 'var(--bg-base)', display: 'flex', flexDirection: 'column' }}>
@@ -92,24 +93,18 @@ export default function App() {
               whileHover={{ scale: 1.02, y: -4 }}
               whileTap={{ scale: 0.98 }}
               onClick={() => setActiveFlow(flow.id)}
+              onHoverStart={() => setHoveredCard(flow.id)}
+              onHoverEnd={() => setHoveredCard(null)}
               style={{
                 flex: '1 1 300px', maxWidth: 380, minWidth: 260, height: 460,
                 background: flow.gradient,
-                border: '1px solid var(--border)',
+                border: hoveredCard === flow.id ? '1px solid rgba(251,35,194,0.5)' : '1px solid var(--border)',
+                boxShadow: hoveredCard === flow.id ? '0 0 40px rgba(251,35,194,0.1), 0 20px 60px rgba(0,0,0,0.4)' : 'none',
                 borderRadius: 20, cursor: 'pointer', overflow: 'hidden',
                 display: 'flex', flexDirection: 'column', position: 'relative',
                 transition: 'border-color 0.25s, box-shadow 0.25s',
               }}
-              onHoverStart={e => {
-                const el = e.target as HTMLElement
-                el.closest?.('[data-card]')
-              }}
             >
-              {/* Hover border glow via CSS class workaround */}
-              <style>{`
-                .flow-card:hover { border-color: rgba(251,35,194,0.5) !important; box-shadow: 0 0 40px rgba(251,35,194,0.1), 0 20px 60px rgba(0,0,0,0.4) !important; }
-              `}</style>
-              <div className="flow-card" style={{ position: 'absolute', inset: 0, borderRadius: 20, border: '1px solid var(--border)', pointerEvents: 'none', transition: 'border-color 0.25s, box-shadow 0.25s' }} />
 
               {/* Blob area */}
               <div style={{ flex: 1, position: 'relative', overflow: 'hidden' }}>

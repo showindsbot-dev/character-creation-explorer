@@ -226,7 +226,7 @@ export default function TemplateFlowModal({ onClose }: Props) {
                     </div>
                     <div>
                       <p style={{ fontSize: 12, color: 'var(--text-tertiary)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 12 }}>Any specific features? <span style={{ color: 'var(--bg-hover)', fontStyle: 'normal' }}>(optional)</span></p>
-                      <input value={feature} onChange={e => setFeature(e.target.value)} placeholder="e.g. scar on left cheek, green eyes..." style={{ width: '100%', maxWidth: 360, background: 'var(--bg-elevated)', border: '1px solid var(--border)', borderRadius: 10, color: 'var(--text-primary)', fontSize: 13, padding: '10px 14px', fontFamily: 'inherit', outline: 'none' }} onFocus={e => e.target.style.borderColor = 'rgba(251,35,194,0.4)'} onBlur={e => e.target.style.borderColor = 'var(--border)'} />
+                      <input value={feature} onChange={e => setFeature(e.target.value)} placeholder="e.g. scar on left cheek, green eyes..." style={{ width: '100%', maxWidth: 360, background: 'var(--bg-elevated)', border: '1px solid var(--border)', borderRadius: 10, color: 'var(--text-primary)', fontSize: 13, padding: '10px 14px', fontFamily: 'inherit', outline: 'none' }} onFocus={e => e.target.style.borderColor = 'rgba(251,35,194,0.4)'} onBlur={e => e.target.style.borderColor = ''} />
                     </div>
                   </div>
 
