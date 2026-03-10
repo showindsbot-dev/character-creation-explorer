@@ -13,7 +13,6 @@ const AESTHETICS = [
   { label: 'Fantasy', gradient: 'linear-gradient(135deg, #1a0a2e, #4a2060)' },
 ]
 const VIBES = ['Mysterious', 'Bold', 'Warm', 'Dark', 'Playful', 'Elegant']
-const GRID = [0, 1, 2, 3, 'plus' as const, 4, 0, 1, 2]
 
 export function V1CastingWall() {
   const [appState, setAppState] = useState<AppState>('entry')
@@ -49,45 +48,69 @@ export function V1CastingWall() {
         {appState === 'entry' && (
           <motion.div key="entry"
             initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0, scale: 0.96 }}
-            style={{ flex: 1, display: 'flex', flexDirection: 'column', padding: '24px 28px', gap: 16, overflow: 'hidden' }}
+            style={{ flex: 1, display: 'flex', flexDirection: 'column', padding: '16px 20px', gap: 10, overflow: 'hidden' }}
           >
             <div style={{ fontSize: 11, color: 'var(--text-tertiary)', textAlign: 'center', letterSpacing: '0.08em', textTransform: 'uppercase' }}>
               Character Studio — Casting Wall
             </div>
 
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 8, flex: 1, minHeight: 0 }}>
-              {GRID.map((item, i) =>
-                item === 'plus' ? (
-                  <motion.div key="plus" whileHover={{ scale: 1.04 }}
+            {/* Mode buttons above grid */}
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8 }}>
+              <div style={{ fontSize: 11, color: 'var(--text-tertiary)' }}>How would you like to create?</div>
+              <div style={{ display: 'flex', gap: 7, flexWrap: 'wrap', justifyContent: 'center' }}>
+                {(['text', 'image', 'design'] as Mode[]).map((m, i) => (
+                  <button key={m}
+                    onClick={() => { setMode(m); setAppState('creation') }}
                     style={{
-                      aspectRatio: '3/4', borderRadius: 12, cursor: 'pointer',
-                      background: 'var(--bg-card)', border: '2px solid var(--accent-pink)',
-                      animation: 'pulse-ring 2.5s ease infinite',
-                      display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 6,
+                      height: 32, padding: '0 14px', borderRadius: 16, fontSize: 12, fontWeight: 500, cursor: 'pointer',
+                      background: mode === m ? 'var(--accent-pink)' : 'var(--bg-elevated)',
+                      border: mode === m ? 'none' : '1px solid var(--border)',
+                      color: mode === m ? '#fff' : 'var(--text-secondary)',
                     }}
                   >
-                    <span style={{ fontSize: 26, color: 'var(--accent-pink)' }}>+</span>
-                    <span style={{ fontSize: 10, color: 'var(--text-tertiary)' }}>Your character</span>
-                  </motion.div>
-                ) : (
-                  <div key={i} style={{ aspectRatio: '3/4', borderRadius: 12, overflow: 'hidden' }}>
-                    <CharacterImageCard index={item as number} size="sm" style={{ height: '100%', width: '100%' }} />
-                  </div>
-                )
-              )}
+                    {['✍ From text', '📷 From image', '✨ Design step by step'][i]}
+                  </button>
+                ))}
+              </div>
             </div>
 
-            <div style={{ display: 'flex', gap: 8, justifyContent: 'center', flexWrap: 'wrap' }}>
-              {(['text', 'image', 'design'] as Mode[]).map((m, i) => (
-                <button key={m}
-                  onClick={() => { setMode(m); setAppState('creation') }}
-                  style={{
-                    height: 38, padding: '0 18px', borderRadius: 19, fontSize: 13, fontWeight: 500, cursor: 'pointer',
-                    background: 'var(--bg-elevated)', border: '1px solid var(--border)', color: 'var(--text-primary)',
-                  }}
-                >
-                  {['✍ From text', '📷 From image', '✨ Design step by step'][i]}
-                </button>
+            {/* Grid: [portrait][YOUR SLOT][portrait] / [portrait][portrait][portrait] */}
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(3, 1fr)',
+              gridTemplateRows: 'repeat(2, 200px)',
+              gap: 8,
+              flex: 1,
+              minHeight: 0,
+            }}>
+              {/* Row 1 */}
+              <div style={{ borderRadius: 12, overflow: 'hidden' }}>
+                <CharacterImageCard index={0} size="sm" style={{ height: '100%', width: '100%', aspectRatio: 'unset' }} />
+              </div>
+
+              <motion.div
+                whileHover={{ boxShadow: '0 0 28px rgba(251,35,194,0.35)', borderColor: 'rgba(251,35,194,0.9)' }}
+                onClick={() => setAppState('creation')}
+                style={{
+                  borderRadius: 16, cursor: 'pointer',
+                  background: 'rgba(251,35,194,0.05)',
+                  border: '2px dashed rgba(251,35,194,0.6)',
+                  display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 6,
+                }}
+              >
+                <span style={{ fontSize: 32, color: 'var(--accent-pink)' }}>+</span>
+                <span style={{ fontSize: 12, color: 'var(--text-secondary)' }}>Your character</span>
+              </motion.div>
+
+              <div style={{ borderRadius: 12, overflow: 'hidden' }}>
+                <CharacterImageCard index={1} size="sm" style={{ height: '100%', width: '100%', aspectRatio: 'unset' }} />
+              </div>
+
+              {/* Row 2 */}
+              {[2, 3, 4].map(idx => (
+                <div key={idx} style={{ borderRadius: 12, overflow: 'hidden' }}>
+                  <CharacterImageCard index={idx} size="sm" style={{ height: '100%', width: '100%', aspectRatio: 'unset' }} />
+                </div>
               ))}
             </div>
           </motion.div>

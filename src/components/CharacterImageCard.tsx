@@ -1,13 +1,15 @@
 import { useState } from 'react'
 
-const CARD_GRADIENTS = [
-  'linear-gradient(160deg, #2c1810, #5c3a1e, #8b5e3c, #c4956a)',
-  'linear-gradient(160deg, #0a0e1a, #1a2340, #2d4a7a, #4a7fa8)',
-  'linear-gradient(160deg, #1a0a1e, #3d1a4a, #6b2d7a, #9b4dab)',
-  'linear-gradient(160deg, #0d1a0a, #1e3d1a, #3a6b35, #5a9b50)',
-  'linear-gradient(160deg, #1a1410, #3d2e1a, #6b5a35, #9b8a5a)',
+export const PORTRAITS = [
+  "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=400&h=533&fit=crop&crop=face",
+  "https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=400&h=533&fit=crop&crop=face",
+  "https://images.unsplash.com/photo-1517841905240-472988babdf9?w=400&h=533&fit=crop&crop=face",
+  "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=533&fit=crop&crop=face",
+  "https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?w=400&h=533&fit=crop&crop=face",
+  "https://images.unsplash.com/photo-1488161628813-04466f872be2?w=400&h=533&fit=crop&crop=face",
+  "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=400&h=533&fit=crop&crop=face",
+  "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400&h=533&fit=crop&crop=face",
 ]
-const FACE_RADIAL = 'radial-gradient(ellipse 60% 80% at 50% 30%, rgba(255,255,255,0.08) 0%, transparent 60%)'
 
 interface Props {
   index: number
@@ -18,7 +20,6 @@ interface Props {
 
 export function CharacterImageCard({ index, onSelect, size = 'lg', style }: Props) {
   const [hovered, setHovered] = useState(false)
-  const gradient = CARD_GRADIENTS[index % CARD_GRADIENTS.length]
   const radius = size === 'sm' ? 10 : 16
 
   return (
@@ -27,15 +28,19 @@ export function CharacterImageCard({ index, onSelect, size = 'lg', style }: Prop
         position: 'relative',
         aspectRatio: '3/4',
         borderRadius: radius,
-        background: gradient,
         overflow: 'hidden',
         cursor: 'pointer',
+        background: '#111',
         ...style,
       }}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
     >
-      <div style={{ position: 'absolute', inset: 0, background: FACE_RADIAL }} />
+      <img
+        src={PORTRAITS[index % PORTRAITS.length]}
+        alt=""
+        style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+      />
 
       {hovered && (
         <div style={{

@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { CharacterImageCard } from '../components/CharacterImageCard'
+import { CharacterImageCard, PORTRAITS } from '../components/CharacterImageCard'
 import { SaveFlow } from '../components/SaveFlow'
 
 type Mode = 'text' | 'image' | 'design'
@@ -13,7 +13,40 @@ const PARTICLES = [
   { left: '78%', top: '35%', delay: '1.1s', dur: '4s' },
   { left: '55%', top: '68%', delay: '0.5s', dur: '2.8s' },
   { left: '30%', top: '78%', delay: '1.7s', dur: '3.5s' },
+  { left: '85%', top: '15%', delay: '0.8s', dur: '3.8s' },
+  { left: '12%', top: '55%', delay: '2.2s', dur: '4.5s' },
 ]
+
+function HumanSilhouette({ scale = 1 }: { scale?: number }) {
+  const s = scale
+  return (
+    <motion.div
+      animate={{ scale: [1, 1.015, 1] }}
+      transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut' }}
+      style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: 120 * s, height: 200 * s }}
+    >
+      {/* Head */}
+      <div style={{
+        width: 52 * s, height: 52 * s, borderRadius: '50%', flexShrink: 0,
+        background: 'linear-gradient(180deg, rgba(251,35,194,0.18) 0%, rgba(100,0,75,0.10) 100%)',
+        border: '1px solid rgba(251,35,194,0.12)',
+      }} />
+      {/* Neck */}
+      <div style={{
+        width: 14 * s, height: 16 * s, flexShrink: 0,
+        background: 'linear-gradient(180deg, rgba(251,35,194,0.13) 0%, rgba(100,0,75,0.08) 100%)',
+      }} />
+      {/* Torso / shoulders */}
+      <div style={{
+        width: 110 * s, height: 100 * s, flexShrink: 0,
+        borderRadius: '50% 50% 10% 10%',
+        background: 'linear-gradient(180deg, rgba(251,35,194,0.15) 0%, rgba(100,0,75,0.08) 100%)',
+        boxShadow: '0 0 40px rgba(251,35,194,0.12)',
+        border: '1px solid rgba(251,35,194,0.08)',
+      }} />
+    </motion.div>
+  )
+}
 
 export function V2Spotlight() {
   const [appState, setAppState] = useState<AppState>('entry')
@@ -48,6 +81,29 @@ export function V2Spotlight() {
     <div style={{ height: '100%', display: 'flex', flexDirection: 'column', position: 'relative', overflow: 'hidden', background: '#0a090b' }}>
       {saveIdx !== null && <SaveFlow characterIndex={saveIdx} onClose={() => setSaveIdx(null)} />}
 
+      {/* Background portrait atmosphere */}
+      <img src={PORTRAITS[0]} alt="" style={{
+        position: 'absolute', left: 0, top: '50%', transform: 'translateY(-50%)',
+        width: 200, height: 300, objectFit: 'cover',
+        filter: 'blur(40px) saturate(0.3)', opacity: 0.12, pointerEvents: 'none', zIndex: 0,
+      }} />
+      <img src={PORTRAITS[1]} alt="" style={{
+        position: 'absolute', right: 0, top: '50%', transform: 'translateY(-50%)',
+        width: 200, height: 300, objectFit: 'cover',
+        filter: 'blur(40px) saturate(0.3)', opacity: 0.12, pointerEvents: 'none', zIndex: 0,
+      }} />
+      <img src={PORTRAITS[2]} alt="" style={{
+        position: 'absolute', left: '50%', top: 0, transform: 'translateX(-50%)',
+        width: 200, height: 300, objectFit: 'cover',
+        filter: 'blur(40px) saturate(0.3)', opacity: 0.12, pointerEvents: 'none', zIndex: 0,
+      }} />
+
+      {/* Radial dark vignette overlay */}
+      <div style={{
+        position: 'absolute', inset: 0, pointerEvents: 'none', zIndex: 0,
+        background: 'radial-gradient(ellipse 80% 80% at 50% 50%, transparent 30%, rgba(0,0,0,0.4) 100%)',
+      }} />
+
       {/* Spotlight cone */}
       <div style={{
         position: 'absolute', top: 0, left: 0, right: 0, height: '50%', pointerEvents: 'none',
@@ -61,6 +117,7 @@ export function V2Spotlight() {
           position: 'absolute', left: p.left, top: p.top,
           width: 3, height: 3, borderRadius: '50%',
           background: 'var(--accent-pink-soft)', pointerEvents: 'none', zIndex: 0,
+          opacity: 0.4,
           animation: `float-particle ${p.dur} ${p.delay} ease-in-out infinite`,
         }} />
       ))}
@@ -70,24 +127,13 @@ export function V2Spotlight() {
         {appState === 'entry' && (
           <motion.div key="entry"
             initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-            style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 28, zIndex: 1, padding: '40px 48px' }}
+            style={{
+              flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center',
+              justifyContent: 'flex-start', paddingTop: '10%', paddingBottom: '18%',
+              gap: 24, zIndex: 1, padding: '10% 48px 18%',
+            }}
           >
-            {/* Silhouette */}
-            <motion.div
-              animate={{ scale: [1, 1.02, 1] }} transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
-              style={{
-                width: 110, height: 190, borderRadius: 55,
-                background: 'linear-gradient(180deg, rgba(40,35,45,0.9) 0%, rgba(20,18,22,0.95) 100%)',
-                border: '1px solid rgba(255,255,255,0.07)',
-                boxShadow: '0 0 60px rgba(251,35,194,0.08)',
-                position: 'relative', overflow: 'hidden',
-              }}
-            >
-              <div style={{
-                position: 'absolute', inset: 0,
-                background: 'radial-gradient(ellipse 70% 50% at 50% 25%, rgba(255,255,255,0.06) 0%, transparent 60%)',
-              }} />
-            </motion.div>
+            <HumanSilhouette />
 
             <div style={{ textAlign: 'center', display: 'flex', flexDirection: 'column', gap: 12 }}>
               <div style={{ fontSize: 26, fontWeight: 300, letterSpacing: '0.04em', color: 'var(--text-primary)' }}>
@@ -109,17 +155,12 @@ export function V2Spotlight() {
         {appState === 'modes' && (
           <motion.div key="modes"
             initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-            style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 24, zIndex: 1, padding: '40px 48px' }}
+            style={{
+              flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center',
+              justifyContent: 'flex-start', gap: 24, zIndex: 1, padding: '10% 48px 18%',
+            }}
           >
-            <motion.div
-              animate={{ scale: [1, 1.02, 1] }} transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
-              style={{
-                width: 80, height: 138, borderRadius: 40,
-                background: 'linear-gradient(180deg, rgba(40,35,45,0.9) 0%, rgba(20,18,22,0.95) 100%)',
-                border: '1px solid rgba(255,255,255,0.07)',
-                boxShadow: '0 0 40px rgba(251,35,194,0.06)',
-              }}
-            />
+            <HumanSilhouette scale={0.72} />
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: 10, width: '100%', maxWidth: 340 }}>
               {[

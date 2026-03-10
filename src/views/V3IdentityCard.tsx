@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { CharacterImageCard } from '../components/CharacterImageCard'
+import { CharacterImageCard, PORTRAITS } from '../components/CharacterImageCard'
 import { SaveFlow } from '../components/SaveFlow'
 
 type Mode = 'text' | 'image' | 'design'
@@ -18,8 +18,6 @@ export function V3IdentityCard() {
   const [appState, setAppState] = useState<AppState>('entry')
   const [mode, setMode] = useState<Mode>('text')
   const [text, setText] = useState('')
-  const [cardRole, setCardRole] = useState('')
-  const [cardOrigin, setCardOrigin] = useState('')
   const [selectedCardResult, setSelectedCardResult] = useState(0)
   const [selVibes, setSelVibes] = useState<string[]>([])
   const [dStep, setDStep] = useState(0)
@@ -39,30 +37,21 @@ export function V3IdentityCard() {
     setChatInput('')
   }
 
-  const handleTextChange = (v: string) => {
-    setText(v)
-    const words = v.trim().split(/\s+/).filter(Boolean)
-    if (words.length >= 3) setCardRole(words.slice(0, 2).join(' '))
-    if (words.length >= 5) setCardOrigin(words[4] || '')
-  }
-
   const ResultCards = [0, 1, 2, 3, ...extraCards]
-
-  const CARD_GRADIENTS = [
-    'linear-gradient(160deg, #2c1810, #5c3a1e, #8b5e3c, #c4956a)',
-    'linear-gradient(160deg, #0a0e1a, #1a2340, #2d4a7a, #4a7fa8)',
-    'linear-gradient(160deg, #1a0a1e, #3d1a4a, #6b2d7a, #9b4dab)',
-    'linear-gradient(160deg, #0d1a0a, #1e3d1a, #3a6b35, #5a9b50)',
-    'linear-gradient(160deg, #1a1410, #3d2e1a, #6b5a35, #9b8a5a)',
-  ]
 
   const IDCard = ({ compact = false }: { compact?: boolean }) => (
     <div style={{
-      width: compact ? '100%' : 520, maxWidth: '100%',
-      background: 'var(--bg-card)', border: '1px solid var(--border)',
-      borderRadius: 20, display: 'flex', overflow: 'hidden',
+      width: '100%',
+      maxWidth: compact ? '100%' : 480,
+      height: compact ? 120 : 200,
+      background: 'var(--bg-card)',
+      border: '1px solid var(--border)',
+      borderRadius: 20,
+      display: 'flex',
+      overflow: 'hidden',
       position: 'relative',
       boxShadow: compact ? '0 4px 24px rgba(0,0,0,0.4)' : '0 8px 40px rgba(0,0,0,0.5)',
+      flexShrink: 0,
     }}>
       {/* Shine overlay */}
       <div style={{
@@ -72,46 +61,54 @@ export function V3IdentityCard() {
         pointerEvents: 'none', zIndex: 2,
       }} />
 
-      {/* Portrait slot */}
-      <div style={{
-        width: compact ? 90 : 120, flexShrink: 0,
-        background: appState === 'results'
-          ? CARD_GRADIENTS[selectedCardResult % CARD_GRADIENTS.length]
-          : 'var(--bg-elevated)',
-        borderRight: '1px solid var(--border)',
-        display: 'flex', alignItems: 'center', justifyContent: 'center', flexDirection: 'column', gap: 6,
-        minHeight: compact ? 120 : 160,
-        transition: 'background 0.4s ease',
-      }}>
-        {appState !== 'results' && (
-          <>
-            <div style={{ width: 36, height: 36, borderRadius: '50%', border: '2px dashed var(--border)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-tertiary)', fontSize: 16 }}>+</div>
-            <div style={{ fontSize: 9, color: 'var(--text-tertiary)', letterSpacing: '0.08em', textAlign: 'center' }}>PORTRAIT</div>
-          </>
-        )}
+      {/* Left: Portrait (40%) */}
+      <div style={{ width: '40%', position: 'relative', flexShrink: 0, overflow: 'hidden' }}>
+        <img
+          src={appState === 'results' ? PORTRAITS[1] : PORTRAITS[0]}
+          alt=""
+          style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+        />
+        {/* Vignette overlay */}
+        <div style={{
+          position: 'absolute', inset: 0,
+          background: 'radial-gradient(ellipse at center, transparent 40%, rgba(0,0,0,0.45) 100%)',
+        }} />
+        {/* Right-edge fade into card body */}
+        <div style={{
+          position: 'absolute', top: 0, right: 0, bottom: 0, width: 30,
+          background: 'linear-gradient(to right, transparent, var(--bg-card))',
+        }} />
       </div>
 
-      {/* Fields */}
-      <div style={{ flex: 1, padding: compact ? '14px 16px' : '20px 22px', display: 'flex', flexDirection: 'column', gap: compact ? 10 : 14 }}>
-        <div style={{ fontSize: 9, color: 'var(--accent-pink)', letterSpacing: '0.12em', fontWeight: 600 }}>CHARACTER PROFILE</div>
-        {[
-          { label: 'NAME', value: '' },
-          { label: 'ROLE', value: cardRole },
-          { label: 'ORIGIN', value: cardOrigin },
-        ].map(f => (
-          <div key={f.label}>
-            <div style={{ fontSize: 9, color: 'var(--text-tertiary)', letterSpacing: '0.1em', marginBottom: 4 }}>{f.label}</div>
-            <div style={{
-              height: 2, background: f.value ? 'var(--border-hover)' : 'var(--border)', borderRadius: 1, width: '100%', position: 'relative',
-            }}>
-              {f.value && (
-                <motion.div initial={{ opacity: 0, scaleX: 0 }} animate={{ opacity: 1, scaleX: 1 }}
-                  style={{ position: 'absolute', top: 4, left: 0, fontSize: 12, color: 'var(--text-secondary)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: '100%' }}
-                >{f.value}</motion.div>
-              )}
-            </div>
-          </div>
-        ))}
+      {/* Right: Name + tag (60%) */}
+      <div style={{
+        flex: 1,
+        padding: compact ? '14px 16px' : '22px 20px',
+        display: 'flex', flexDirection: 'column', gap: 8, justifyContent: 'center',
+      }}>
+        <div style={{ fontSize: 9, color: 'var(--accent-pink)', letterSpacing: '0.12em', fontWeight: 600 }}>
+          CHARACTER PROFILE
+        </div>
+        <div style={{
+          fontSize: compact ? 20 : 26,
+          fontWeight: 300,
+          color: appState === 'results' ? 'var(--text-primary)' : 'rgba(255,255,255,0.25)',
+          letterSpacing: '0.02em',
+          lineHeight: 1.2,
+        }}>
+          {appState === 'results' ? 'Character #1' : '—'}
+        </div>
+        <div style={{
+          fontSize: 11,
+          color: appState === 'results' ? 'var(--accent-pink-soft)' : 'var(--text-tertiary)',
+          padding: '3px 8px',
+          background: appState === 'results' ? 'rgba(251,35,194,0.1)' : 'rgba(255,255,255,0.04)',
+          border: appState === 'results' ? '1px solid rgba(251,35,194,0.25)' : '1px solid rgba(255,255,255,0.06)',
+          borderRadius: 6,
+          display: 'inline-block', alignSelf: 'flex-start',
+        }}>
+          {appState === 'results' ? 'Your character ✦' : 'Character not yet created'}
+        </div>
       </div>
     </div>
   )
@@ -125,7 +122,7 @@ export function V3IdentityCard() {
         {appState === 'entry' && (
           <motion.div key="entry"
             initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0, scale: 0.97 }}
-            style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '24px 32px', gap: 20, overflowY: 'auto' }}
+            style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '20px 28px', gap: 16, overflowY: 'auto' }}
           >
             <div style={{ fontSize: 11, color: 'var(--text-tertiary)', letterSpacing: '0.08em', textTransform: 'uppercase' }}>
               Character Studio — Identity
@@ -133,9 +130,9 @@ export function V3IdentityCard() {
 
             <IDCard />
 
-            <div style={{ fontSize: 13, color: 'var(--text-secondary)' }}>How would you like to start?</div>
+            <div style={{ fontSize: 14, fontWeight: 500, color: 'var(--text-primary)' }}>How would you like to start?</div>
 
-            <div style={{ display: 'flex', gap: 8 }}>
+            <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', justifyContent: 'center' }}>
               {(['text', 'image', 'design'] as Mode[]).map((m, i) => (
                 <button key={m} onClick={() => setMode(m)} style={{
                   height: 36, padding: '0 16px', borderRadius: 18, fontSize: 13, cursor: 'pointer',
@@ -143,16 +140,16 @@ export function V3IdentityCard() {
                   border: mode === m ? '1px solid var(--accent-pink)' : '1px solid var(--border)',
                   color: mode === m ? 'var(--accent-pink-soft)' : 'var(--text-secondary)',
                 }}>
-                  {['Describe them', 'Upload a photo', 'Build their profile'][i]}
+                  {['✍ Describe them', '📷 Upload a photo', '✨ Build their profile'][i]}
                 </button>
               ))}
             </div>
 
             {mode === 'text' && (
               <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
-                style={{ width: '100%', maxWidth: 520, display: 'flex', flexDirection: 'column', gap: 12 }}
+                style={{ width: '100%', maxWidth: 480, display: 'flex', flexDirection: 'column', gap: 12 }}
               >
-                <textarea value={text} onChange={e => handleTextChange(e.target.value)}
+                <textarea value={text} onChange={e => setText(e.target.value)}
                   placeholder="Describe your character… who they are, where they come from, what drives them..."
                   rows={4}
                   style={{
@@ -172,7 +169,7 @@ export function V3IdentityCard() {
 
             {mode === 'image' && (
               <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
-                style={{ width: '100%', maxWidth: 520, display: 'flex', flexDirection: 'column', gap: 12 }}
+                style={{ width: '100%', maxWidth: 480, display: 'flex', flexDirection: 'column', gap: 12 }}
               >
                 <div style={{
                   height: 160, border: '2px dashed var(--accent-pink)', borderRadius: 16,
@@ -190,7 +187,7 @@ export function V3IdentityCard() {
 
             {mode === 'design' && (
               <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
-                style={{ width: '100%', maxWidth: 520, display: 'flex', flexDirection: 'column', gap: 14 }}
+                style={{ width: '100%', maxWidth: 480, display: 'flex', flexDirection: 'column', gap: 14 }}
               >
                 <div style={{ display: 'flex', gap: 6 }}>
                   {['Aesthetic', 'Energy', 'Details'].map((s, i) => (
@@ -203,7 +200,7 @@ export function V3IdentityCard() {
                     <div style={{ fontSize: 15, fontWeight: 500 }}>Choose an aesthetic</div>
                     <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
                       {AESTHETICS.map((a) => (
-                        <button key={a.label} onClick={() => { setCardRole(a.label); setDStep(1) }} style={{
+                        <button key={a.label} onClick={() => setDStep(1)} style={{
                           aspectRatio: '2/1', borderRadius: 10, background: a.gradient, border: '2px solid transparent',
                           cursor: 'pointer', display: 'flex', alignItems: 'flex-end', padding: 10,
                         }}>

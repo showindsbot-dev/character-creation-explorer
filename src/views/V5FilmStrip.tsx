@@ -1,6 +1,6 @@
 import { useState, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { CharacterImageCard } from '../components/CharacterImageCard'
+import { CharacterImageCard, PORTRAITS } from '../components/CharacterImageCard'
 import { SaveFlow } from '../components/SaveFlow'
 
 type Mode = 'text' | 'image' | 'design'
@@ -15,6 +15,59 @@ function SprocketRow() {
         <div key={i} style={{ width: 12, height: 10, borderRadius: 3, background: 'var(--bg-base)', border: '1px solid rgba(255,255,255,0.08)', flexShrink: 0 }} />
       ))}
     </div>
+  )
+}
+
+const TAKE_PORTRAITS = [PORTRAITS[0], PORTRAITS[1], PORTRAITS[2]]
+
+function TakeCard({ num, icon, title, sub, portraitSrc, onSelect }: {
+  num: string; icon: string; title: string; sub: string; portraitSrc: string; onSelect: () => void
+}) {
+  return (
+    <motion.button
+      whileHover={{ scale: 1.03, borderColor: 'var(--accent-pink)' }}
+      whileTap={{ scale: 0.98 }}
+      onClick={onSelect}
+      style={{
+        flex: 1, minWidth: 0,
+        background: 'rgba(0,0,0,0.6)',
+        border: '1px solid var(--border)',
+        borderRadius: 16,
+        padding: '16px',
+        cursor: 'pointer',
+        textAlign: 'left',
+        display: 'flex',
+        flexDirection: 'column',
+        gap: 8,
+        position: 'relative',
+        overflow: 'hidden',
+        height: 160,
+      }}
+    >
+      {/* Background portrait */}
+      <img
+        src={portraitSrc}
+        alt=""
+        style={{
+          position: 'absolute', inset: 0,
+          width: '100%', height: '100%',
+          objectFit: 'cover', display: 'block',
+          opacity: 0.25,
+        }}
+      />
+      {/* Dark gradient overlay for readability */}
+      <div style={{
+        position: 'absolute', inset: 0,
+        background: 'linear-gradient(160deg, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.35) 100%)',
+      }} />
+      {/* Content */}
+      <div style={{ position: 'relative', zIndex: 1, display: 'flex', flexDirection: 'column', gap: 8, height: '100%', justifyContent: 'center' }}>
+        <div style={{ fontSize: 10, color: 'var(--accent-pink)', letterSpacing: '0.12em', fontWeight: 600 }}>TAKE {num}</div>
+        <div style={{ fontSize: 20 }}>{icon}</div>
+        <div style={{ fontSize: 14, fontWeight: 600, color: 'var(--text-primary)' }}>{title}</div>
+        <div style={{ fontSize: 12, color: 'var(--text-tertiary)', lineHeight: 1.4 }}>{sub}</div>
+      </div>
+    </motion.button>
   )
 }
 
@@ -44,22 +97,6 @@ export function V5FilmStrip() {
 
   const ResultCards = [0, 1, 2, 3, ...extraCards]
 
-  const TakeCard = ({ num, icon, title, sub, m }: { num: string; icon: string; title: string; sub: string; m: Mode }) => (
-    <motion.button whileHover={{ scale: 1.03, borderColor: 'var(--accent-pink)' }} whileTap={{ scale: 0.98 }}
-      onClick={() => { setMode(m); setAppState('creation') }}
-      style={{
-        flex: 1, minWidth: 0, background: 'rgba(255,255,255,0.03)', border: '1px solid var(--border)',
-        borderRadius: 16, padding: '20px 16px', cursor: 'pointer', textAlign: 'left',
-        display: 'flex', flexDirection: 'column', gap: 10,
-      }}
-    >
-      <div style={{ fontSize: 10, color: 'var(--accent-pink)', letterSpacing: '0.12em', fontWeight: 600 }}>TAKE {num}</div>
-      <div style={{ fontSize: 22 }}>{icon}</div>
-      <div style={{ fontSize: 14, fontWeight: 600, color: 'var(--text-primary)' }}>{title}</div>
-      <div style={{ fontSize: 12, color: 'var(--text-tertiary)', lineHeight: 1.4 }}>{sub}</div>
-    </motion.button>
-  )
-
   return (
     <div style={{ height: '100%', display: 'flex', flexDirection: 'column', position: 'relative', overflow: 'hidden' }}>
       {saveIdx !== null && <SaveFlow characterIndex={saveIdx} onClose={() => setSaveIdx(null)} />}
@@ -72,17 +109,17 @@ export function V5FilmStrip() {
             style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}
           >
             <SprocketRow />
-            <div style={{ flex: 1, display: 'flex', flexDirection: 'column', padding: '24px 28px', gap: 20, justifyContent: 'center' }}>
+            <div style={{ flex: 1, display: 'flex', flexDirection: 'column', padding: '20px 24px', gap: 16, justifyContent: 'center' }}>
               <div>
-                <div style={{ fontSize: 11, color: 'var(--text-tertiary)', letterSpacing: '0.14em', textAlign: 'center', marginBottom: 6 }}>SCENE 01</div>
-                <div style={{ fontSize: 26, fontWeight: 300, textAlign: 'center', letterSpacing: '0.04em' }}>CAST YOUR CHARACTER</div>
+                <div style={{ fontSize: 11, color: 'var(--text-tertiary)', letterSpacing: '0.14em', textAlign: 'center', marginBottom: 4 }}>SCENE 01</div>
+                <div style={{ fontSize: 26, fontWeight: 300, textAlign: 'center', letterSpacing: '0.04em', marginBottom: 20 }}>CAST YOUR CHARACTER</div>
               </div>
-              <div style={{ display: 'flex', gap: 12 }}>
-                <TakeCard num="01" icon="✍" title="Write the brief" sub="Describe who they are" m="text" />
-                <TakeCard num="02" icon="📷" title="Show the reference" sub="Upload an image" m="image" />
-                <TakeCard num="03" icon="⚙" title="Build the role" sub="Choose their attributes" m="design" />
+              <div style={{ display: 'flex', gap: 10 }}>
+                <TakeCard num="01" icon="✍" title="Write the brief" sub="Describe who they are" portraitSrc={TAKE_PORTRAITS[0]} onSelect={() => { setMode('text'); setAppState('creation') }} />
+                <TakeCard num="02" icon="📷" title="Show the reference" sub="Upload an image" portraitSrc={TAKE_PORTRAITS[1]} onSelect={() => { setMode('image'); setAppState('creation') }} />
+                <TakeCard num="03" icon="✦" title="Build the role" sub="Choose their attributes" portraitSrc={TAKE_PORTRAITS[2]} onSelect={() => { setMode('design'); setAppState('creation') }} />
               </div>
-              <div style={{ fontSize: 11, color: 'var(--text-tertiary)', textAlign: 'center' }}>
+              <div style={{ fontSize: 11, color: 'var(--text-tertiary)', textAlign: 'center', marginTop: 16 }}>
                 All character generations are saved. No pressure.
               </div>
             </div>
@@ -136,7 +173,6 @@ export function V5FilmStrip() {
                     display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 12, cursor: 'pointer',
                     position: 'relative', overflow: 'hidden',
                   }}>
-                    {/* Film frame corners */}
                     {[[-1,-1],[1,-1],[-1,1],[1,1]].map(([sx,sy], i) => (
                       <div key={i} style={{
                         position: 'absolute',
@@ -321,7 +357,7 @@ export function V5FilmStrip() {
                 <button onClick={refine} style={{ width: 28, height: 28, borderRadius: '50%', background: 'var(--accent-pink)', border: 'none', color: '#fff', cursor: 'pointer', fontSize: 12 }}>↑</button>
               </div>
 
-              <div style={{ textAlign: 'center', fontSize: 11, color: 'var(--text-tertiary)', paddingBottom: 2 }}>
+              <div style={{ textAlign: 'center', fontSize: 11, color: 'var(--text-tertiary)', marginTop: 16, paddingBottom: 2 }}>
                 ✦ All creations are saved to your generation history
               </div>
             </div>

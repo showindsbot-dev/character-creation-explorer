@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { CharacterImageCard } from '../components/CharacterImageCard'
+import { CharacterImageCard, PORTRAITS } from '../components/CharacterImageCard'
 import { SaveFlow } from '../components/SaveFlow'
 
 type Mode = 'text' | 'image' | 'design'
@@ -41,61 +41,83 @@ export function V4Oracle() {
         {appState === 'entry' && (
           <motion.div key="entry"
             initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0, scale: 0.95 }}
-            style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 20, padding: '40px 48px' }}
+            style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 20, padding: '40px 48px', position: 'relative' }}
           >
-            <div style={{ fontSize: 11, color: 'var(--text-tertiary)', letterSpacing: '0.1em', textTransform: 'uppercase' }}>
-              Character Studio
-            </div>
+            {/* Background portrait atmosphere */}
+            <img src={PORTRAITS[3]} alt="" style={{
+              position: 'absolute', left: 0, bottom: 0,
+              width: 180, height: 260, objectFit: 'cover',
+              filter: 'blur(60px) saturate(0.2)', opacity: 0.08, pointerEvents: 'none',
+            }} />
+            <img src={PORTRAITS[4]} alt="" style={{
+              position: 'absolute', right: 0, bottom: 0,
+              width: 180, height: 260, objectFit: 'cover',
+              filter: 'blur(60px) saturate(0.2)', opacity: 0.08, pointerEvents: 'none',
+            }} />
+            <img src={PORTRAITS[5]} alt="" style={{
+              position: 'absolute', left: '50%', top: 0, transform: 'translateX(-50%)',
+              width: 180, height: 220, objectFit: 'cover',
+              filter: 'blur(60px) saturate(0.2)', opacity: 0.08, pointerEvents: 'none',
+            }} />
+            <img src={PORTRAITS[6]} alt="" style={{
+              position: 'absolute', left: 0, top: 0,
+              width: 150, height: 200, objectFit: 'cover',
+              filter: 'blur(60px) saturate(0.2)', opacity: 0.06, pointerEvents: 'none',
+            }} />
 
             {/* The Orb */}
-            <div style={{ position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <div style={{ position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1 }}>
               {/* Rotating border */}
               <motion.div
                 animate={{ rotate: 360 }} transition={{ duration: 8, repeat: Infinity, ease: 'linear' }}
                 style={{
                   position: 'absolute',
-                  width: 180, height: 180, borderRadius: '50%',
+                  width: 210, height: 210, borderRadius: '50%',
                   background: 'conic-gradient(from 0deg, transparent 0%, var(--accent-pink) 20%, transparent 40%, var(--accent-pink-soft) 60%, transparent 80%)',
                   opacity: 0.4,
                 }}
               />
-              {/* Outer glow */}
+              {/* Outer glow mask */}
               <div style={{
                 position: 'absolute',
-                width: 174, height: 174, borderRadius: '50%',
+                width: 204, height: 204, borderRadius: '50%',
                 background: 'var(--bg-base)',
               }} />
-              {/* Orb itself */}
+              {/* Orb button */}
               <motion.button
                 whileHover={{ scale: 1.06 }} whileTap={{ scale: 0.96 }}
                 onClick={() => setAppState('creation')}
                 style={{
                   position: 'relative',
-                  width: 160, height: 160, borderRadius: '50%', cursor: 'pointer',
+                  width: 180, height: 180, borderRadius: '50%', cursor: 'pointer',
                   background: 'radial-gradient(circle at 35% 35%, rgba(100,0,75,0.8) 0%, rgba(20,18,22,1) 70%)',
                   border: 'none',
                   boxShadow: '0 0 60px rgba(251,35,194,0.3), inset 0 0 30px rgba(251,35,194,0.1)',
-                  display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 6,
+                  display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 4,
                   zIndex: 1,
                 }}
               >
-                <span style={{ fontSize: 28, color: 'var(--accent-pink-soft)' }}>✦</span>
-                <span style={{ fontSize: 14, color: 'var(--text-secondary)', fontWeight: 500, letterSpacing: '0.04em' }}>Create</span>
+                <span style={{ fontSize: 26, color: 'var(--accent-pink-soft)' }}>✦</span>
+                <span style={{ fontSize: 11, color: 'var(--text-tertiary)', letterSpacing: '0.07em' }}>Create my</span>
+                <span style={{ fontSize: 15, color: 'var(--accent-pink-soft)', fontWeight: 500, letterSpacing: '0.04em' }}>character</span>
               </motion.button>
             </div>
 
-            <div style={{ fontSize: 11, color: 'var(--text-tertiary)', textAlign: 'center', lineHeight: 1.8 }}>
-              or start with{' '}
+            {/* Alternative entry pills */}
+            <div style={{ display: 'flex', gap: 8, zIndex: 1, flexWrap: 'wrap', justifyContent: 'center' }}>
               {(['text', 'image', 'design'] as Mode[]).map((m, i) => (
-                <span key={m}>
-                  <button onClick={() => { setMode(m); setAppState('creation') }} style={{
-                    background: 'none', border: 'none', color: 'var(--accent-pink-soft)', cursor: 'pointer', fontSize: 11,
-                    textDecoration: 'underline', padding: 0,
-                  }}>
-                    {['a description', 'a photo', 'step by step'][i]}
-                  </button>
-                  {i < 2 && <span style={{ color: 'var(--text-tertiary)' }}> · </span>}
-                </span>
+                <button key={m}
+                  onClick={() => { setMode(m); setAppState('creation') }}
+                  style={{
+                    height: 34, padding: '0 16px', borderRadius: 17, fontSize: 13, cursor: 'pointer',
+                    background: 'rgba(255,255,255,0.05)',
+                    border: '1px solid rgba(255,255,255,0.1)',
+                    color: 'var(--text-secondary)',
+                    backdropFilter: 'blur(8px)',
+                  }}
+                >
+                  {['✍ Describe', '📷 Upload', '✨ Step by step'][i]}
+                </button>
               ))}
             </div>
           </motion.div>
