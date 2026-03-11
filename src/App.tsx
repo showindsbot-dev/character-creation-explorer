@@ -5,9 +5,11 @@ import { V2Spotlight } from './views/V2Spotlight'
 import { V3IdentityCard } from './views/V3IdentityCard'
 import { V4Oracle } from './views/V4Oracle'
 import { V5FilmStrip } from './views/V5FilmStrip'
+import { V6SpotlightRefined } from './views/V6SpotlightRefined'
+import { V7DirectorsCut } from './views/V7DirectorsCut'
 import './index.css'
 
-type Version = 'V1' | 'V2' | 'V3' | 'V4' | 'V5'
+type Version = 'V1' | 'V2' | 'V3' | 'V4' | 'V5' | 'V6' | 'V7'
 
 const TABS: { id: Version; label: string; desc: string }[] = [
   { id: 'V1', label: 'V1', desc: 'Casting Wall' },
@@ -15,6 +17,8 @@ const TABS: { id: Version; label: string; desc: string }[] = [
   { id: 'V3', label: 'V3', desc: 'Identity Card' },
   { id: 'V4', label: 'V4', desc: 'Oracle' },
   { id: 'V5', label: 'V5', desc: 'Film Strip' },
+  { id: 'V6', label: 'V6', desc: 'Spotlight ✦' },
+  { id: 'V7', label: 'V7', desc: "Director's Cut" },
 ]
 
 function ProductBg() {
@@ -118,6 +122,8 @@ export default function App() {
               {version === 'V3' && <V3IdentityCard />}
               {version === 'V4' && <V4Oracle />}
               {version === 'V5' && <V5FilmStrip />}
+              {version === 'V6' && <V6SpotlightRefined />}
+              {version === 'V7' && <V7DirectorsCut />}
             </motion.div>
           </AnimatePresence>
         </div>
